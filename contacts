@@ -1,0 +1,118 @@
+#!/bin/bash
+#Description: Add entries to the contact list
+#-----------------------------------------------
+FILE="./contact_book"
+if [ ! -d "$FILE" ]
+#check for the FILEectory otherwise create it
+  then
+    mkdir $FILE
+fi
+
+usage() { echo "Usage: $0 -a [to add a new contact] ||  -r [to remove a contact] ||  -d [to display a formatted contact] "; exit 0; }
+# usage function will be called if the user does enter commands other than :a:r:d
+addContact () { 
+                echo "Add new contact option selected! "
+                echo "Please insert a name: "
+                        read name
+                echo "Please insert an address: "
+                        read address
+                echo "Please insert an email address: "
+                        read email
+                echo "Please insert a phone number(s): "
+                        read phone
+                # Echo the answers and ask for confirmation
+                        echo "Should I enter the values:"
+                        echo "Name: $name "
+                        echo "Address: $address"
+                        echo "Email: $email"
+                        echo "Phone Number: $phone"
+                        echo -n "Y for Yes/N for No: "
+                        read answer
+                        if [ "$answer" == "Y" ]
+                        then
+                        # Write the values to the contact book
+	   	        echo "Name: $name" >> "$FILE/${name}"
+		        echo "Email: $email" >>  "$FILE/${name}"
+		        echo "Address: $address" >>  "$FILE/${name}"
+		        echo "Phone Number: $phone" >>  "$FILE/${name}"
+		        echo "${name} created in ${FILE} Directory!"
+                        else
+                        # Give the user a message
+                                echo "Name: $name "
+                                echo "Address: $address"
+                                echo "Email: $email"
+                                echo "Phone Number: $phone"
+                                echo "NOT written to Contacts"
+                        fi
+                        }
+removeContact () { 
+                echo "Remove contact selected!"
+		read -p 'Please enter the contact name you would like to delete: ' delete
+		rm $FILE/$delete
+		echo "$FILE/$delete file deleted!"
+}
+displayContact(){
+                echo "Display contact selected!"
+		read -p 'Please enter the contact you would like to view: ' view
+		read -p 'Would you like to view specific field [Y for Yes/N for No]?: ' answer
+		# if the user enters "Y", the program will ask the user to enter the specific filed the user would like to view 
+		# if the user enters "N", the program will echo out all the lines in the contact file
+		answer=${answer^}
+		if [ "$answer" = 'N' ]; then 
+			while read line; do
+                        echo $line
+               		 done < "$FILE/${view}"
+			 exit 0
+		elif [ "$answer" = "Y" ]
+	       	then 
+		read -p 'Pleae enter [n] for name || [a] for address || [e] for email || [p] for phone nmumber(s): ' reply
+		#depending on which reply ,the program will read the file and echo out the only matched content
+		if [ "$reply" = 'n' ];then
+			NAME="Name"
+			while read line ;do 
+				grep -q $NAME <<< $line && echo $line	
+			done < "$FILE/${view}"
+		elif [ "$reply" = 'a' ];then 
+			ADDRESS="Address"
+			while read line; do 
+				grep -q $ADDRESS <<< $line && echo $line
+			done < "$FILE/${view}"
+		elif [ "$reply" = 'e' ]; then
+			EMAIL='Email'
+			while read line; do 
+				grep -q $EMAIL <<< $line && echo $line
+			done < "$FILE/${view}"
+		elif [ "$reply" = 'p' ]; then 
+			PHONE='Phone'
+			while read line; do
+				grep -q $PHONE <<< $line && echo $line
+			done < "$FILE/${view}"				
+			fi
+		fi
+}
+while getopts ":ard" opt; do
+        # checks the option below and matches the alpahabet
+    case "${opt}" in
+        a)
+                addContact
+                exit 0
+                ;;
+        r)
+                removeContact
+		exit 0
+		;;
+
+        d)		
+                displayContact
+                exit 0
+		;;
+        ?)      
+                usage
+                ;;
+
+        h)      
+                usage
+                ;;
+    esac
+done
+shift $((OPTIND-1))

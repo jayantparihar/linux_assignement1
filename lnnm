@@ -1,0 +1,47 @@
+
+#!/bin/bash
+#Description: Output a file with line numbers
+#-----------------------------------------------
+
+
+FILENAME="$1"
+#get the filename from the user
+
+LINENUM="$2"
+
+usage() { echo "Usage: $0 <Filename> [to display without line numbers  ||  $0 <filename> -n [to display with line numberst] || $0 -h[to display help menu] "; exit 0; }
+
+Number=0
+#Number is used to print out the line number
+
+
+while getopts ":h" opt; do
+	case "${opt}" in
+		h)
+			usage
+			;;
+        ?)
+            usage
+            ;;
+
+		esac
+	done
+
+if [[ "$LINENUM" == '-n' ]]; then
+
+	while read line; do
+	#read the line and display with number of the line
+		((Number++))
+		echo "$Number. $line";
+	done < $FILENAME
+elif [[ "${#LINENUM}" -eq 0 ]]; then
+	while read line; do
+	#read the line and display it without number
+		echo "$line"
+	done < $FILENAME
+fi
+exit 0
+
+
+
+

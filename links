@@ -1,0 +1,21 @@
+#!/bin/bash
+#Description: Display links on a web page
+#-----------------------------------------------
+
+url="$2"
+
+newFile="pageLinks"
+
+while getopts ":f:h" opt; do
+  case ${opt} in
+    f ) wget -O $newFile $url -q
+    grep -Po '(?<=href=")(https)[^"]*' $newFile > links_file
+    rm $newFile
+    echo "Write successfull to links_file"
+      ;;
+    h ) echo "Usage: cmd [-f] [url]"
+      ;;
+    \? ) echo "Usage: cmd [-f] [url]"
+      ;;
+  esac
+done
